@@ -1,0 +1,8 @@
+language: csharp
+mono: none
+dotnet: 2.1.401
+install:
+ - cd Images.Web && npm install
+script:
+ - dotnet --info
+ - dotnet build
