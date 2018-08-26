@@ -241,3 +241,5 @@ _Pvt_Extensions
 Images\.Tests/coverage\.opencover\.xml
 
 \.vscode/
+
+tools/

@@ -2,10 +2,10 @@ language: csharp
 mono: none
 dotnet: 2.1.401
 install:
- - cd Images.Web && npm install
+ - (cd Images.Web && npm install)
  - dotnet tool install --tool-path tools coveralls.net
 script:
  - dotnet --info
  - dotnet build
  - dotnet test ./Images.Tests/Images.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
- - ./tools/csmacnz.Coveralls --opencover -i coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:TRAVIS_COMMIT --commitBranch $env:TRAVIS_BRANCH --commitMessage $env:TRAVIS_COMMIT_MESSAGE --jobId $env:TRAVIS_JOB_ID
+ - ./tools/csmacnz.Coveralls --opencover -i ./Images.Tests/coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:TRAVIS_COMMIT --commitBranch $env:TRAVIS_BRANCH --commitMessage $env:TRAVIS_COMMIT_MESSAGE --jobId $env:TRAVIS_JOB_ID
