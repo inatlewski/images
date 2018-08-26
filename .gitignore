@@ -239,7 +239,5 @@ _Pvt_Extensions
 .fake/
 
 Images\.Tests/coverage\.opencover\.xml
-
 \.vscode/
-
 tools/

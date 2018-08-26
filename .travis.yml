@@ -8,4 +8,4 @@ script:
  - dotnet --info
  - dotnet build
  - dotnet test ./Images.Tests/Images.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
- - ./tools/csmacnz.Coveralls --opencover -i ./Images.Tests/coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN --commitId $env:TRAVIS_COMMIT --commitBranch $env:TRAVIS_BRANCH --commitMessage $env:TRAVIS_COMMIT_MESSAGE --jobId $env:TRAVIS_JOB_ID
+ - ./tools/csmacnz.Coveralls --opencover -i ./Images.Tests/coverage.opencover.xml --repoToken $env:COVERALLS_REPO_TOKEN
