@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+using Images.Model.Entities.Interfaces;
 
 namespace Images.Model.Entities
 {
-    public class Auditable
+    public class BaseEntity : IAuditable, IEntity
     {
         public string CreatedBy { get; set; }
 

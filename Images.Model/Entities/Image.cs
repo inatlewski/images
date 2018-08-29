@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace Images.Model.Entities
 {
-    public class Image : Auditable
+    public class Image : BaseEntity
     {
         public int Id { get; set; }
 

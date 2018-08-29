@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Images.Model.DTO
+﻿namespace Images.Model.DTO
 {
     public class CommentDto : AuditDto
     {

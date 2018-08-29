@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Images.BusinessLogic
+﻿namespace Images.BusinessLogic
 {
     public class Class1
     {
