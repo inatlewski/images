@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Images.Common
+﻿namespace Images.Common
 {
     public class Class1
     {
