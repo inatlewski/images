@@ -2,17 +2,17 @@ language: csharp
 mono: none
 dotnet: 2.1.401
 before_install:
+ - REPO_COMMIT_AUTHOR=$(git show -s --pretty=format:"%cn")
+ - REPO_COMMIT_AUTHOR_EMAIL=$(git show -s --pretty=format:"%ce")
+ - REPO_COMMIT_MESSAGE=$(git show -s --pretty=format:"%s")
   - wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227.zip
   - unzip sonar-scanner-cli-3.2.0.1227.zip
   - export PATH=$PATH:$PWD/sonar-scanner-3.2.0.1227/bin/
 install:
- - sonar-scanner -Dsonar.projectKey=inatlewski_images -Dsonar.organization=inatlewski-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONARCLOUD_TOKEN
  - (cd Images.Web && npm install)
  - dotnet tool install --tool-path tools coveralls.net
 script:
- - REPO_COMMIT_AUTHOR=$(git show -s --pretty=format:"%cn")
- - REPO_COMMIT_AUTHOR_EMAIL=$(git show -s --pretty=format:"%ce")
- - REPO_COMMIT_MESSAGE=$(git show -s --pretty=format:"%s")
  - dotnet build
  - dotnet test ./Images.Tests/Images.Tests.csproj /p:CollectCoverage=true /p:CoverletOutputFormat=opencover
  - ./tools/csmacnz.Coveralls --opencover -i ./Images.Tests/coverage.opencover.xml --repoToken $COVERALLS_REPO_TOKEN --commitId $TRAVIS_COMMIT --commitBranch $TRAVIS_BRANCH --commitAuthor "$REPO_COMMIT_AUTHOR" --commitEmail "$REPO_COMMIT_AUTHOR_EMAIL" --commitMessage "$REPO_COMMIT_MESSAGE" --jobId $TRAVIS_JOB_ID  --serviceName "travis-ci"  --useRelativePaths
+ - sonar-scanner -Dsonar.projectKey=inatlewski_images -Dsonar.organization=inatlewski-github -Dsonar.sources=. -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONARCLOUD_TOKEN -Dsonar.branch.name=$TRAVIS_BRANCH
