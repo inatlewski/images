@@ -5,8 +5,16 @@ using Images.Model.Entities;
 
 namespace Images.Model.Mappings
 {
+    /// <summary>
+    /// Class CommentMappingProfile.
+    /// Implements the <see cref="AutoMapper.Profile" />
+    /// </summary>
+    /// <seealso cref="AutoMapper.Profile" />
     public class CommentMappingProfile : Profile
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CommentMappingProfile"/> class.
+        /// </summary>
         public CommentMappingProfile()
         {
             CreateMap<Comment, CommentOutDto>()
