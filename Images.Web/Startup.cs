@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Reflection;
+using FluentValidation.AspNetCore;
 using Images.DataAccess;
+using Images.Model.DTO.In;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -37,12 +39,18 @@ namespace Images.Web
                 .AddJsonOptions(options =>
                 {
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                })
+                .AddFluentValidation(fv =>
+                {
+                    fv.RegisterValidatorsFromAssemblyContaining<CommentInDtoValidator>();
+                    fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
+                    fv.ImplicitlyValidateChildProperties = true;
                 });
 
             services.AddDbContext<ImagesContext>(options =>
-                options.UseSqlite(Configuration.GetConnectionString("SqliteConnection")
-                    //options.UseSqlServer(Configuration.GetConnectionString("LocalDbConnection")
-                ));
+                options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
+                //options.UseSqlServer(Configuration.GetConnectionString("LocalDbConnection")
+            );
 
             services.AddSwaggerGen(c =>
             {
