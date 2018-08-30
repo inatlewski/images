@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace Images.Model.DTO
+namespace Images.Model.DTO.Out
 {
-    public class ImageDto : AuditDto
+    public class ImageOutDto : AuditOutDto
     {
         public int Id { get; set; }
 
@@ -10,6 +10,6 @@ namespace Images.Model.DTO
 
         public string Url { get; set; }
 
-        public ICollection<CommentDto> Comments { get; set; } = new List<CommentDto>();
+        public ICollection<CommentOutDto> Comments { get; set; } = new List<CommentOutDto>();
     }
 }

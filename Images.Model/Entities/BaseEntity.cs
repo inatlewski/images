@@ -11,6 +11,6 @@ namespace Images.Model.Entities
         public string CreatedBy { get; set; }
 
         [Required]
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     }
 }

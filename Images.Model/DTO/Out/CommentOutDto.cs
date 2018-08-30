@@ -1,6 +1,6 @@
-﻿namespace Images.Model.DTO
+﻿namespace Images.Model.DTO.Out
 {
-    public class CommentDto : AuditDto
+    public class CommentOutDto : AuditOutDto
     {
         public int Id { get; set; }
 

@@ -1,8 +1,9 @@
 ﻿using System;
 
-namespace Images.Model.DTO
+
+namespace Images.Model.DTO.Out
 {
-    public class AuditDto
+    public class AuditOutDto
     {
         public string CreatedBy { get; set; }
 
