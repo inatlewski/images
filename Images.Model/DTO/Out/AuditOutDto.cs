@@ -1,6 +1,5 @@
 ﻿using System;
 
-
 namespace Images.Model.DTO.Out
 {
     public class AuditOutDto

@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using AutoMapper;
 using FluentValidation.AspNetCore;
 using Images.DataAccess;
 using Images.Model.DTO.In;
@@ -51,6 +52,8 @@ namespace Images.Web
                 options.UseSqlite(Configuration.GetConnectionString("SqliteConnection"))
                 //options.UseSqlServer(Configuration.GetConnectionString("LocalDbConnection")
             );
+
+            services.AddAutoMapper();
 
             services.AddSwaggerGen(c =>
             {
