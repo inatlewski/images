@@ -3,14 +3,14 @@
 namespace Images.Model.DTO.Out
 {
     /// <summary>
-    /// Class ImageListOutDto.
+    /// Represents a model of list of images.
     /// </summary>
     public class ImageListOutDto
     {
         /// <summary>
-        /// Gets or sets the images.
+        /// Gets or sets the list of images.
         /// </summary>
-        /// <value>The images.</value>
+        /// <value>The list of images.</value>
         public IList<ImageOutDto> Images { get; set; } = new List<ImageOutDto>();
     }
 }

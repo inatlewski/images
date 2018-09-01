@@ -3,20 +3,20 @@
 namespace Images.Model.DTO.Out
 {
     /// <summary>
-    /// Class ImageOutDto.
+    /// Represents a model of image.
     /// Implements the <see cref="Images.Model.DTO.Out.AuditOutDto" />
     /// </summary>
     /// <seealso cref="Images.Model.DTO.Out.AuditOutDto" />
     public class ImageOutDto : AuditOutDto
     {
         /// <summary>
-        /// Gets or sets the identifier.
+        /// Gets or sets the image identifier.
         /// </summary>
         /// <value>The identifier.</value>
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the description.
+        /// Gets or sets a description of the image.
         /// </summary>
         /// <value>The description.</value>
         public string Description { get; set; }
@@ -28,9 +28,9 @@ namespace Images.Model.DTO.Out
         public string Url { get; set; }
 
         /// <summary>
-        /// Gets or sets the comments.
+        /// Gets or sets the list of comments.
         /// </summary>
-        /// <value>The comments.</value>
+        /// <value>The list of comments.</value>
         public ICollection<CommentOutDto> Comments { get; set; } = new List<CommentOutDto>();
     }
 }
