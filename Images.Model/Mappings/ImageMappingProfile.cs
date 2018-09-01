@@ -5,8 +5,16 @@ using Images.Model.Entities;
 
 namespace Images.Model.Mappings
 {
+    /// <summary>
+    /// Class ImageMappingProfile.
+    /// Implements the <see cref="AutoMapper.Profile" />
+    /// </summary>
+    /// <seealso cref="AutoMapper.Profile" />
     public class ImageMappingProfile : Profile
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ImageMappingProfile"/> class.
+        /// </summary>
         public ImageMappingProfile()
         {
             CreateMap<Image, ImageOutDto>()
