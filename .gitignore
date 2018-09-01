@@ -28,7 +28,6 @@ Obj/
 \.vs/
 \.vscode/
 
-/Properties/launchSettings.json
 /yarn.lock
 
 # MSTest test Results
