@@ -14,9 +14,9 @@
         public int Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the content.
+        /// Gets or sets the comment content.
         /// </summary>
-        /// <value>The content.</value>
+        /// <value>The comment content.</value>
         public string Content { get; set; }
     }
 }

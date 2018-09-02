@@ -48,6 +48,15 @@ namespace Images.DataAccess
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entity"></param>
+        public void Update(TEntity entity)
+        {
+            ObjectSet.Update(entity);
+        }
+
+        /// <summary>
         /// Deletes the specified entity from the object set.
         /// </summary>
         /// <param name="entity">The entity.</param>
