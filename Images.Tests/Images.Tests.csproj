@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Images.BusinessLogic\Images.BusinessLogic.csproj" />
     <ProjectReference Include="..\Images.Web\Images.Web.csproj" />
   </ItemGroup>
 

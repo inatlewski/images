@@ -9,6 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Images.Common\Images.Common.csproj" />
     <ProjectReference Include="..\Images.DataAccess\Images.DataAccess.csproj" />
     <ProjectReference Include="..\Images.Model\Images.Model.csproj" />
   </ItemGroup>
