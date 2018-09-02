@@ -1,12 +1,11 @@
-﻿using System;
-using Images.Model.DTO.In;
-using Images.Model.Entities;
+﻿using Images.Model.DTO.In;
+using Images.Model.DTO.Out;
 
 namespace Images.BusinessLogic.Interfaces
 {
     public interface IImageService
     {
-        Image GetImage(int imageId);
+        ImageOutDto GetImage(int imageId);
 
         bool AddImage(ImageInDto imageDto);
 

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Images.BusinessLogic.Interfaces;
 using Images.DataAccess.Interfaces;
 using Images.Model.DTO.In;
+using Images.Model.DTO.Out;
 using Images.Model.Entities;
 
 namespace Images.BusinessLogic.Implementations
@@ -17,7 +16,7 @@ namespace Images.BusinessLogic.Implementations
             _imageRepository = imageRepository;
         }
 
-        public Image GetImage()
+        public ImageOutDto GetImage(int imageId)
         {
             throw new NotImplementedException();
         }
