@@ -26,8 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Images.DataAccess\Images.DataAccess.csproj" />
-    <ProjectReference Include="..\Images.Model\Images.Model.csproj" />
+    <ProjectReference Include="..\Images.BusinessLogic\Images.BusinessLogic.csproj" />
   </ItemGroup>
 
   <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">

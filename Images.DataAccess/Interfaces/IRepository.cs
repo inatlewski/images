@@ -29,19 +29,19 @@ namespace Images.DataAccess.Interfaces
         /// Adds the specified entity to the object set.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        void Add(TEntity entity);
+        void Add(TEntity entity, bool saveChanges = true);
 
         /// <summary>
         /// Updates the specified entity in the object set.
         /// </summary>
         /// <param name="entity"></param>
-        void Update(TEntity entity);
+        void Update(TEntity entity, bool saveChanges = true);
         
         /// <summary>
         /// Deletes the specified entity from the object set.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        void Delete(TEntity entity);
+        void Delete(TEntity entity, bool saveChanges = true);
 
         /// <summary>
         /// Finds an entity in the object set using the primary key.
@@ -70,5 +70,10 @@ namespace Images.DataAccess.Interfaces
         /// <param name="predicate">The predicate.</param>
         /// <returns>The queryable object set.</returns>
         IQueryable<TEntity> Query(Expression<Func<TEntity, bool>> predicate = null);
+
+        /// <summary>
+        /// Saves the changes in the database context.
+        /// </summary>
+        void SaveChanges();
     }
 }

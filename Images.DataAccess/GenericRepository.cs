@@ -42,27 +42,42 @@ namespace Images.DataAccess
         /// Adds the specified entity to the object set.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public void Add(TEntity entity)
+        public void Add(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Add(entity);
+
+            if (saveChanges)
+            {
+                DbContext.SaveChanges();
+            }
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="entity"></param>
-        public void Update(TEntity entity)
+        public void Update(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Update(entity);
+
+            if (saveChanges)
+            {
+                DbContext.SaveChanges();
+            }
         }
 
         /// <summary>
         /// Deletes the specified entity from the object set.
         /// </summary>
         /// <param name="entity">The entity.</param>
-        public void Delete(TEntity entity)
+        public void Delete(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Remove(entity);
+
+            if (saveChanges)
+            {
+                DbContext.SaveChanges();
+            }
         }
 
         /// <summary>
@@ -117,6 +132,14 @@ namespace Images.DataAccess
             }
 
             return ObjectSet.AsQueryable();
+        }
+
+        /// <summary>
+        /// Saves the changes in the database context.
+        /// </summary>
+        public void SaveChanges()
+        {
+            DbContext.SaveChanges();
         }
     }
 }
