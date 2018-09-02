@@ -8,12 +8,26 @@ namespace Images.Tests
     /// </summary>
     public class InitializeAutomapper
     {
+        private static readonly object IsInitialized = false;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="InitializeAutomapper"/> class.
         /// </summary>
-        public InitializeAutomapper()
+        static InitializeAutomapper()
         {
-            Mapper.Initialize(cfg => cfg.AddProfiles(typeof(ImageMappingProfile)));
+            if ((bool)IsInitialized)
+            {
+                return;
+            }
+
+            lock (IsInitialized)
+            {
+                if (!(bool)IsInitialized)
+                {
+                    Mapper.Initialize(cfg => cfg.AddProfiles(typeof(ImageMappingProfile)));
+                    IsInitialized = true;
+                }
+            }
         }
     }
 }

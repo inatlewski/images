@@ -30,6 +30,12 @@ namespace Images.DataAccess.Interfaces
         /// </summary>
         /// <param name="entity">The entity.</param>
         void Add(TEntity entity);
+
+        /// <summary>
+        /// Updates the specified entity in the object set.
+        /// </summary>
+        /// <param name="entity"></param>
+        void Update(TEntity entity);
         
         /// <summary>
         /// Deletes the specified entity from the object set.

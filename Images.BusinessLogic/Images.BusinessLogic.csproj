@@ -5,8 +5,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Implementations\" />
+    <PackageReference Include="Serilog" Version="2.7.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Images.DataAccess\Images.DataAccess.csproj" />
+    <ProjectReference Include="..\Images.Model\Images.Model.csproj" />
   </ItemGroup>
 
 </Project>

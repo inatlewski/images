@@ -236,5 +236,6 @@ _Pvt_Extensions
 
 Images\.Web/node_modules/
 Images\.Web/wwwroot/dist/
+Images\.Web/Images\.Web\.xml
 Images\.Tests/coverage\.opencover\.xml
 Images\.Tests/tools/

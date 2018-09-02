@@ -58,7 +58,7 @@ namespace Images.Web
                 })
                 .AddFluentValidation(fv =>
                 {
-                    fv.RegisterValidatorsFromAssemblyContaining<CommentInDtoValidator>();
+                    fv.RegisterValidatorsFromAssemblyContaining<UpdateImageInDtoValidator>();
                     fv.RunDefaultMvcValidationAfterFluentValidationExecutes = false;
                     fv.ImplicitlyValidateChildProperties = true;
                 });
