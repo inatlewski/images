@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using FluentAssertions;
 using Images.BusinessLogic.Implementations;
 using Images.BusinessLogic.Interfaces;
@@ -23,12 +24,12 @@ namespace Images.Tests.BusinessLogic
         {
             _commentRepository = Substitute.For<IRepository<Comment>>();
             _logger = Substitute.For<ILogger>();
-            _commentService= new CommentService(_commentRepository, _logger); 
+            _commentService= new CommentService(_commentRepository, _logger);
         }
 
         #region GetComment
         [Fact]
-        public void GetComment_ShouldReturnCommentFromRepository_WhenCommentExists()
+        public void GetComment_ShouldReturnCommentFromRepositoryWithOkStatus_WhenCommentExists()
         {
             // Arrange
             var commentId = 1;
@@ -42,12 +43,14 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.GetComment(commentId);
 
             //Assert
-            result.Id.Should().Be(commentId);
+            result.Model.Id.Should().Be(commentId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _commentRepository.Received().FindByKey(commentId);
         }
 
         [Fact]
-        public void GetComment_ShouldReturnNull_WhenCommentDoesNotExist()
+        public void GetComment_ShouldReturnNullWithNotFoundStatus_WhenCommentDoesNotExist()
         {
             // Arrange
             var commentId = 1;
@@ -57,12 +60,14 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.GetComment(commentId);
 
             //Assert
-            result.Should().BeNull();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.CommentNotFound);
             _commentRepository.Received().FindByKey(commentId);
         }
 
         [Fact]
-        public void GetComment_ShouldLogExceptionAndReturnNull_WhenExceptionWasThrown()
+        public void GetComment_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
             var commentId = 1;
@@ -73,79 +78,106 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.GetComment(commentId);
 
             //Assert
-            result.Should().BeNull();
-            _logger.Received().Error(exception, ErrorMessages.GetCommentExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.GetCommentException);
+            _logger.Received().Error(exception, ErrorMessage.GetCommentException);
         }
         #endregion
 
         #region AddComment
         [Fact]
-        public void AddComment_ShouldAddCommentToRepositoryAndReturnTrue_WhenModelIsNotNull()
+        public void AddComment_ShouldAddCommentToRepositoryAndReturnCommentWithCreatedStatus_WhenModelIsNotNull()
         {
             // Arrange
+            var imageId = 1;
             var commentDto = new CommentInDto();
+            var newCommentId = 1;
+            _commentRepository.Add(Arg.Any<Comment>()).Returns(call =>
+            {
+                var comment = call.Arg<Comment>();
+                comment.Id = newCommentId;
+                return comment;
+            });
 
             // Act
-            var result = _commentService.AddComment(commentDto);
+            var result = _commentService.AddComment(imageId, commentDto);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Id.Should().Be(newCommentId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            result.Errors.Should().BeEmpty();
             _commentRepository.Received(1).Add(Arg.Any<Comment>());
         }
 
         [Fact]
-        public void AddComment_ShouldReturnFalse_WhenModelIsNull()
+        public void AddComment_ShouldReturnNullWithBadRequestStatus_WhenModelIsNull()
         {
             // Arrange
+            var imageId = 1;
             CommentInDto commentDto = null;
 
             // Act
-            var result = _commentService.AddComment(commentDto);
+            var result = _commentService.AddComment(imageId, commentDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Errors.Should().Contain(ErrorMessage.CommentIsNull);
             _commentRepository.DidNotReceive().Update(Arg.Any<Comment>());
         }
 
         [Fact]
-        public void AddComment_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void AddComment_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
+            var imageId = 1;
             var commentDto = new CommentInDto();
             var exception = new Exception();
             _commentRepository.When(r => r.Add(Arg.Any<Comment>())).Do(x => throw exception);
 
             // Act
-            var result = _commentService.AddComment(commentDto);
+            var result = _commentService.AddComment(imageId, commentDto);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.AddCommentExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.AddCommentException);
+            
+            
+            _logger.Received().Error(exception, ErrorMessage.AddCommentException);
         }
         #endregion
 
         #region UpdateComment
         [Fact]
-        public void UpdateComment_ShouldUpdateCommentInRepositoryAndReturnTrue_WhenCommentExists()
+        public void UpdateComment_ShouldUpdateCommentInRepositoryAndReturnCommentWithOkStatus_WhenCommentExists()
         {
             // Arrange
+            var commentId = 1;
             var commentDto = new UpdateCommentInDto
             {
-                Id = 1
+                Id = commentId
             };
-            var comment = new Comment();
+            var comment = new Comment
+            {
+                Id = commentId
+            };
             _commentRepository.FindByKey(commentDto.Id).Returns(comment);
+            _commentRepository.Update(Arg.Any<Comment>()).Returns(call => call.Arg<Comment>());
 
             // Act
             var result = _commentService.UpdateComment(commentDto);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Id.Should().Be(commentId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _commentRepository.Received(1).Update(comment);
         }
 
         [Fact]
-        public void UpdateComment_ShouldNotUpdateAnyCommentInRepositoryAndReturnFalse_WhenModelIsNull()
+        public void UpdateComment_ShouldNotUpdateAnyCommentInRepositoryAndReturnNullWithBadRequestStatus_WhenModelIsNull()
         {
             // Arrange
             UpdateCommentInDto commentDto = null;
@@ -154,12 +186,14 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.UpdateComment(commentDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Errors.Should().Contain(ErrorMessage.CommentIsNull);
             _commentRepository.DidNotReceive().Update(Arg.Any<Comment>());
         }
 
         [Fact]
-        public void UpdateComment_ShouldNotUpdateAnyCommentInRepositoryAndReturnFalse_WhenCommentDoesNotExist()
+        public void UpdateComment_ShouldNotUpdateAnyCommentInRepositoryAndReturnNullWithNotFoundStatus_WhenCommentDoesNotExist()
         {
             // Arrange
             var commentDto = new UpdateCommentInDto
@@ -172,18 +206,21 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.UpdateComment(commentDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.CommentNotFound);
             _commentRepository.Received(1).FindByKey(commentDto.Id);
             _commentRepository.DidNotReceive().Update(Arg.Any<Comment>());
         }
 
         [Fact]
-        public void UpdateComment_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void UpdateComment_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
+            var commentId = 1;
             var commentDto = new UpdateCommentInDto
             {
-                Id = 1
+                Id = commentId
             };
             var comment = new Comment();
             var exception = new Exception();
@@ -194,14 +231,16 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.UpdateComment(commentDto);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.UpdateCommentExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.UpdateCommentException);
+            _logger.Received().Error(exception, ErrorMessage.UpdateCommentException);
         }
         #endregion
 
         #region DeleteComment
         [Fact]
-        public void DeleteComment_ShouldDeleteCommentFromRepositoryAndReturnTrue_WhenCommentExists()
+        public void DeleteComment_ShouldDeleteCommentFromRepositoryAndReturnTrueWithOkStatus_WhenCommentExists()
         {
             // Arrange
             var commentId = 1;
@@ -212,13 +251,15 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.DeleteComment(commentId);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Should().BeTrue();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _commentRepository.Received().FindByKey(commentId);
             _commentRepository.Received().Delete(comment);
         }
 
         [Fact]
-        public void DeleteComment_ShouldNotDeleteAnyCommentFromRepositoryAndReturnFalse_WhenCommentDoesNotExist()
+        public void DeleteComment_ShouldNotDeleteAnyCommentFromRepositoryAndReturnFalseWithNotFoundStatus_WhenCommentDoesNotExist()
         {
             // Arrange
             var commentId = 1;
@@ -228,13 +269,15 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.DeleteComment(commentId);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeFalse();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.CommentNotFound);
             _commentRepository.Received().FindByKey(commentId);
             _commentRepository.DidNotReceive().Delete(Arg.Any<Comment>());
         }
 
         [Fact]
-        public void DeleteComment_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void DeleteComment_ShouldLogExceptionAndReturnFalseWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
             var commentId = 1;
@@ -247,8 +290,10 @@ namespace Images.Tests.BusinessLogic
             var result = _commentService.DeleteComment(commentId);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.DeleteCommentExceptionMessage);
+            result.Model.Should().BeFalse();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.DeleteCommentException);
+            _logger.Received().Error(exception, ErrorMessage.DeleteCommentException);
         } 
         #endregion
     }
