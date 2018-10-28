@@ -5,7 +5,7 @@ before_install:
  - REPO_COMMIT_AUTHOR=$(git show -s --pretty=format:"%cn")
  - REPO_COMMIT_AUTHOR_EMAIL=$(git show -s --pretty=format:"%ce")
  - REPO_COMMIT_MESSAGE=$(git show -s --pretty=format:"%s")
- - wget https://sonarsource.bintray.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227.zip
+ - wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-3.2.0.1227.zip
  - unzip sonar-scanner-cli-3.2.0.1227.zip
  - export PATH=$PATH:$PWD/sonar-scanner-3.2.0.1227/bin/
 install:
