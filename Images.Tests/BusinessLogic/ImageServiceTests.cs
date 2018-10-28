@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using FluentAssertions;
 using Images.BusinessLogic.Implementations;
 using Images.BusinessLogic.Interfaces;
@@ -23,12 +24,12 @@ namespace Images.Tests.BusinessLogic
         {
             _imageRepository = Substitute.For<IRepository<Image>>();
             _logger = Substitute.For<ILogger>();
-            _imageService= new ImageService(_imageRepository, _logger); 
+            _imageService= new ImageService(_imageRepository, _logger);
         }
 
         #region GetImage
         [Fact]
-        public void GetImage_ShouldReturnImageFromRepository_WhenImageExists()
+        public void GetImage_ShouldReturnImageFromRepositoryWithOkStatus_WhenImageExists()
         {
             // Arrange
             var imageId = 1;
@@ -42,12 +43,14 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.GetImage(imageId);
 
             //Assert
-            result.Id.Should().Be(imageId);
+            result.Model.Id.Should().Be(imageId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _imageRepository.Received().FindByKey(imageId);
         }
 
         [Fact]
-        public void GetImage_ShouldReturnNull_WhenImageDoesNotExist()
+        public void GetImage_ShouldReturnNullWithNotFoundStatus_WhenImageDoesNotExist()
         {
             // Arrange
             var imageId = 1;
@@ -57,12 +60,14 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.GetImage(imageId);
 
             //Assert
-            result.Should().BeNull();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.ImageNotFound);
             _imageRepository.Received().FindByKey(imageId);
         }
 
         [Fact]
-        public void GetImage_ShouldLogExceptionAndReturnNull_WhenExceptionWasThrown()
+        public void GetImage_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
             var imageId = 1;
@@ -73,28 +78,39 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.GetImage(imageId);
 
             //Assert
-            result.Should().BeNull();
-            _logger.Received().Error(exception, ErrorMessages.GetImageExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.GetImageException);
+            _logger.Received().Error(exception, ErrorMessage.GetImageException);
         }
         #endregion
 
         #region AddImage
         [Fact]
-        public void AddImage_ShouldAddImageToRepositoryAndReturnTrue_WhenModelIsNotNull()
+        public void AddImage_ShouldAddImageToRepositoryAndReturnImageWithCreatedStatus_WhenModelIsNotNull()
         {
             // Arrange
             var imageDto = new ImageInDto();
+            var newImageId = 1;
+            _imageRepository.Add(Arg.Any<Image>()).Returns(call =>
+            {
+                var image = call.Arg<Image>();
+                image.Id = newImageId;
+                return image;
+            });
 
             // Act
             var result = _imageService.AddImage(imageDto);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Id.Should().Be(newImageId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.Created);
+            result.Errors.Should().BeEmpty();
             _imageRepository.Received(1).Add(Arg.Any<Image>());
         }
 
         [Fact]
-        public void AddImage_ShouldReturnFalse_WhenModelIsNull()
+        public void AddImage_ShouldReturnNullWithBadRequestStatus_WhenModelIsNull()
         {
             // Arrange
             ImageInDto imageDto = null;
@@ -103,12 +119,14 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.AddImage(imageDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Errors.Should().Contain(ErrorMessage.ImageIsNull);
             _imageRepository.DidNotReceive().Update(Arg.Any<Image>());
         }
 
         [Fact]
-        public void AddImage_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void AddImage_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
             var imageDto = new ImageInDto();
@@ -119,33 +137,44 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.AddImage(imageDto);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.AddImageExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.AddImageException);
+            
+            
+            _logger.Received().Error(exception, ErrorMessage.AddImageException);
         }
         #endregion
 
         #region UpdateImage
         [Fact]
-        public void UpdateImage_ShouldUpdateImageInRepositoryAndReturnTrue_WhenImageExists()
+        public void UpdateImage_ShouldUpdateImageInRepositoryAndReturnImageWithOkStatus_WhenImageExists()
         {
             // Arrange
+            var imageId = 1;
             var imageDto = new UpdateImageInDto
             {
-                Id = 1
+                Id = imageId
             };
-            var image = new Image();
+            var image = new Image
+            {
+                Id = imageId
+            };
             _imageRepository.FindByKey(imageDto.Id).Returns(image);
+            _imageRepository.Update(Arg.Any<Image>()).Returns(call => call.Arg<Image>());
 
             // Act
             var result = _imageService.UpdateImage(imageDto);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Id.Should().Be(imageId);
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _imageRepository.Received(1).Update(image);
         }
 
         [Fact]
-        public void UpdateImage_ShouldNotUpdateAnyImageInRepositoryAndReturnFalse_WhenModelIsNull()
+        public void UpdateImage_ShouldNotUpdateAnyImageInRepositoryAndReturnNullWithBadRequestStatus_WhenModelIsNull()
         {
             // Arrange
             UpdateImageInDto imageDto = null;
@@ -154,12 +183,14 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.UpdateImage(imageDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.BadRequest);
+            result.Errors.Should().Contain(ErrorMessage.ImageIsNull);
             _imageRepository.DidNotReceive().Update(Arg.Any<Image>());
         }
 
         [Fact]
-        public void UpdateImage_ShouldNotUpdateAnyImageInRepositoryAndReturnFalse_WhenImageDoesNotExist()
+        public void UpdateImage_ShouldNotUpdateAnyImageInRepositoryAndReturnNullWithNotFoundStatus_WhenImageDoesNotExist()
         {
             // Arrange
             var imageDto = new UpdateImageInDto
@@ -172,18 +203,21 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.UpdateImage(imageDto);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.ImageNotFound);
             _imageRepository.Received(1).FindByKey(imageDto.Id);
             _imageRepository.DidNotReceive().Update(Arg.Any<Image>());
         }
 
         [Fact]
-        public void UpdateImage_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void UpdateImage_ShouldLogExceptionAndReturnNullWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
+            var imageId = 1;
             var imageDto = new UpdateImageInDto
             {
-                Id = 1
+                Id = imageId
             };
             var image = new Image();
             var exception = new Exception();
@@ -194,14 +228,16 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.UpdateImage(imageDto);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.UpdateImageExceptionMessage);
+            result.Model.Should().BeNull();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.UpdateImageException);
+            _logger.Received().Error(exception, ErrorMessage.UpdateImageException);
         }
         #endregion
 
         #region DeleteImage
         [Fact]
-        public void DeleteImage_ShouldDeleteImageFromRepositoryAndReturnTrue_WhenImageExists()
+        public void DeleteImage_ShouldDeleteImageFromRepositoryAndReturnTrueWithOkStatus_WhenImageExists()
         {
             // Arrange
             var imageId = 1;
@@ -212,13 +248,15 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.DeleteImage(imageId);
 
             //Assert
-            result.Should().BeTrue();
+            result.Model.Should().BeTrue();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.OK);
+            result.Errors.Should().BeEmpty();
             _imageRepository.Received().FindByKey(imageId);
             _imageRepository.Received().Delete(image);
         }
 
         [Fact]
-        public void DeleteImage_ShouldNotDeleteAnyImageFromRepositoryAndReturnFalse_WhenImageDoesNotExist()
+        public void DeleteImage_ShouldNotDeleteAnyImageFromRepositoryAndReturnFalseWithNotFoundStatus_WhenImageDoesNotExist()
         {
             // Arrange
             var imageId = 1;
@@ -228,13 +266,15 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.DeleteImage(imageId);
 
             //Assert
-            result.Should().BeFalse();
+            result.Model.Should().BeFalse();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.NotFound);
+            result.Errors.Should().Contain(ErrorMessage.ImageNotFound);
             _imageRepository.Received().FindByKey(imageId);
             _imageRepository.DidNotReceive().Delete(Arg.Any<Image>());
         }
 
         [Fact]
-        public void DeleteImage_ShouldLogExceptionAndReturnFalse_WhenExceptionWasThrown()
+        public void DeleteImage_ShouldLogExceptionAndReturnFalseWithInternalServerErrorStatus_WhenExceptionWasThrown()
         {
             // Arrange
             var imageId = 1;
@@ -247,8 +287,10 @@ namespace Images.Tests.BusinessLogic
             var result = _imageService.DeleteImage(imageId);
 
             //Assert
-            result.Should().BeFalse();
-            _logger.Received().Error(exception, ErrorMessages.DeleteImageExceptionMessage);
+            result.Model.Should().BeFalse();
+            result.HttpStatusCode.Should().Be(HttpStatusCode.InternalServerError);
+            result.Errors.Should().Contain(ErrorMessage.DeleteImageException);
+            _logger.Received().Error(exception, ErrorMessage.DeleteImageException);
         } 
         #endregion
     }
