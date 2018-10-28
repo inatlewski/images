@@ -3,7 +3,7 @@
 namespace Images.Model.DTO.Out
 {
     /// <summary>
-    /// Class AuditOutDto.
+    /// Represents a model of auditable object.
     /// </summary>
     public class AuditOutDto
     {

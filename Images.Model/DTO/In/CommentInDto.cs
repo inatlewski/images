@@ -4,12 +4,12 @@ using FluentValidation;
 namespace Images.Model.DTO.In
 {
     /// <summary>
-    /// Class CommentInDto.
+    /// Represents a model of comment.
     /// </summary>
     public class CommentInDto
     {
         /// <summary>
-        /// Gets or sets the content.
+        /// Gets or sets the comment content.
         /// </summary>
         /// <value>The content.</value>
         [Required]
@@ -26,14 +26,15 @@ namespace Images.Model.DTO.In
     }
 
     /// <summary>
-    /// Class CommentInDtoValidator.
-    /// Implements the <see cref="FluentValidation.AbstractValidator{Images.Model.DTO.In.CommentInDto}" />
+    /// Represents a validator for <see cref="CommentInDto" />.
+    /// Implements the <see cref="FluentValidation.AbstractValidator{T}" />
     /// </summary>
-    /// <seealso cref="FluentValidation.AbstractValidator{Images.Model.DTO.In.CommentInDto}" />
-    public class CommentInDtoValidator : AbstractValidator<CommentInDto> 
+    /// <typeparam name="T"></typeparam>
+    /// <seealso cref="FluentValidation.AbstractValidator{T}" />
+    public class CommentInDtoValidator<T> : AbstractValidator<T> where T : CommentInDto
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="CommentInDtoValidator"/> class.
+        /// Initializes a new instance of the <see cref="CommentInDtoValidator{T}"/> class.
         /// </summary>
         public CommentInDtoValidator()
         {

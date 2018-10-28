@@ -3,12 +3,12 @@
 namespace Images.Model.DTO.In
 {
     /// <summary>
-    /// Class ImageInDto.
+    /// Represents a model of image.
     /// </summary>
     public class ImageInDto
     {
         /// <summary>
-        /// Gets or sets the description.
+        /// Gets or sets a description of the image.
         /// </summary>
         /// <value>The description.</value>
         public string Description { get; set; }
@@ -21,14 +21,15 @@ namespace Images.Model.DTO.In
     }
 
     /// <summary>
-    /// Class ImageInDtoValidator.
-    /// Implements the <see cref="FluentValidation.AbstractValidator{Images.Model.DTO.In.ImageInDto}" />
+    /// Represents a validator for <see cref="ImageInDto" />.
+    /// Implements the <see cref="FluentValidation.AbstractValidator{T}" />
     /// </summary>
-    /// <seealso cref="FluentValidation.AbstractValidator{Images.Model.DTO.In.ImageInDto}" />
-    public class ImageInDtoValidator : AbstractValidator<ImageInDto>
+    /// <typeparam name="T"></typeparam>
+    /// <seealso cref="FluentValidation.AbstractValidator{T}" />
+    public class ImageInDtoValidator<T> : AbstractValidator<T> where T : ImageInDto
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ImageInDtoValidator"/> class.
+        /// Initializes a new instance of the <see cref="ImageInDtoValidator{T}"/> class.
         /// </summary>
         public ImageInDtoValidator()
         {
