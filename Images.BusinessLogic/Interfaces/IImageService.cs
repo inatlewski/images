@@ -1,16 +1,17 @@
-﻿using Images.Model.DTO.In;
+﻿using Images.Common;
+using Images.Model.DTO.In;
 using Images.Model.DTO.Out;
 
 namespace Images.BusinessLogic.Interfaces
 {
     public interface IImageService
     {
-        ImageOutDto GetImage(int imageId);
+        OperationResult<ImageOutDto> GetImage(int imageId);
 
-        bool AddImage(ImageInDto imageDto);
+        OperationResult<ImageOutDto> AddImage(ImageInDto imageDto);
 
-        bool UpdateImage(UpdateImageInDto imageDto);
+        OperationResult<ImageOutDto> UpdateImage(UpdateImageInDto imageDto);
 
-        bool DeleteImage(int imageId);
+        OperationResult<bool> DeleteImage(int imageId);
     }
 }

@@ -41,8 +41,9 @@ namespace Images.DataAccess
         /// <summary>
         /// Adds the specified entity to the object set.
         /// </summary>
-        /// <param name="entity">The entity.</param>
-        public void Add(TEntity entity, bool saveChanges = true)
+        /// <param name="entity">The entity to add.</param>
+        /// <returns>The added entity.</returns>
+        public TEntity Add(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Add(entity);
 
@@ -50,13 +51,16 @@ namespace Images.DataAccess
             {
                 DbContext.SaveChanges();
             }
+
+            return entity;
         }
 
         /// <summary>
-        /// 
+        /// Updates the specified entity in the object set.
         /// </summary>
-        /// <param name="entity"></param>
-        public void Update(TEntity entity, bool saveChanges = true)
+        /// <param name="entity">The entity to update</param>
+        /// <returns>The updated entity.</returns>
+        public TEntity Update(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Update(entity);
 
@@ -64,12 +68,16 @@ namespace Images.DataAccess
             {
                 DbContext.SaveChanges();
             }
+
+            DbContext.Entry<TEntity>(entity).Reload();
+
+            return entity;
         }
 
         /// <summary>
         /// Deletes the specified entity from the object set.
         /// </summary>
-        /// <param name="entity">The entity.</param>
+        /// <param name="entity">The entity to delete.</param>
         public void Delete(TEntity entity, bool saveChanges = true)
         {
             ObjectSet.Remove(entity);

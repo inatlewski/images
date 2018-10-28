@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using AutoMapper;
 using Images.BusinessLogic.Interfaces;
 using Images.Common;
@@ -21,7 +22,7 @@ namespace Images.BusinessLogic.Implementations
             _logger = logger;
         }
 
-        public ImageOutDto GetImage(int imageId)
+        public OperationResult<ImageOutDto> GetImage(int imageId)
         {
             try
             {
@@ -29,73 +30,75 @@ namespace Images.BusinessLogic.Implementations
 
                 if (image == null)
                 {
-                    return null;
+                    return new OperationResult<ImageOutDto>(HttpStatusCode.NotFound, ErrorMessage.ImageNotFound);
                 }
 
                 var imageDto = Mapper.Map<ImageOutDto>(image);
 
-                return imageDto;
+                return new OperationResult<ImageOutDto>(imageDto, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.GetImageExceptionMessage);
+                _logger.Error(e, ErrorMessage.GetImageException);
 
-                return null;
+                return new OperationResult<ImageOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.GetImageException);
             }
         }
 
-        public bool AddImage(ImageInDto imageDto)
+        public OperationResult<ImageOutDto> AddImage(ImageInDto imageDto)
         {
             try
             {
                 if (imageDto == null)
                 {
-                    return false;
+                    return new OperationResult<ImageOutDto>(HttpStatusCode.BadRequest, ErrorMessage.ImageIsNull);
                 }
 
-                var image = Mapper.Map<Image>(imageDto);
-                _imageRepository.Add(image);
+                var imageToAdd = Mapper.Map<Image>(imageDto);
+                var addedImage = _imageRepository.Add(imageToAdd);
+                var imageOutDto = Mapper.Map<ImageOutDto>(addedImage);
 
-                return true;
+                return new OperationResult<ImageOutDto>(imageOutDto, HttpStatusCode.Created);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.AddImageExceptionMessage);
+                _logger.Error(e, ErrorMessage.AddImageException);
 
-                return false;
+                return new OperationResult<ImageOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.AddImageException);
             }
         }
 
-        public bool UpdateImage(UpdateImageInDto imageDto)
+        public OperationResult<ImageOutDto> UpdateImage(UpdateImageInDto imageDto)
         {
             try
             {
                 if (imageDto == null)
                 {
-                    return false;
+                    return new OperationResult<ImageOutDto>(HttpStatusCode.BadRequest, ErrorMessage.ImageIsNull);
                 }
 
                 var image = _imageRepository.FindByKey(imageDto.Id);
 
                 if (image == null)
                 {
-                    return false;
+                    return new OperationResult<ImageOutDto>(HttpStatusCode.NotFound, ErrorMessage.ImageNotFound);
                 }
 
                 Mapper.Map(imageDto, image);
-                _imageRepository.Update(image);
+                var updatedImage = _imageRepository.Update(image);
+                var imageOutDto = Mapper.Map<ImageOutDto>(updatedImage);
 
-                return true;
+                return new OperationResult<ImageOutDto>(imageOutDto, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.UpdateImageExceptionMessage);
+                _logger.Error(e, ErrorMessage.UpdateImageException);
 
-                return false;
+                return new OperationResult<ImageOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.UpdateImageException);
             }
         }
 
-        public bool DeleteImage(int imageId)
+        public OperationResult<bool> DeleteImage(int imageId)
         {
             try
             {
@@ -103,18 +106,18 @@ namespace Images.BusinessLogic.Implementations
 
                 if (image == null)
                 {
-                    return false;
+                    return new OperationResult<bool>(HttpStatusCode.NotFound, ErrorMessage.ImageNotFound);
                 }
 
                 _imageRepository.Delete(image);
 
-                return true;
+                return new OperationResult<bool>(true, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.DeleteImageExceptionMessage);
+                _logger.Error(e, ErrorMessage.DeleteImageException);
 
-                return false;
+                return new OperationResult<bool>(HttpStatusCode.InternalServerError, ErrorMessage.DeleteImageException);
             }
         }
     }

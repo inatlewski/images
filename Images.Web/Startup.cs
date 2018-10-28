@@ -108,7 +108,7 @@ namespace Images.Web
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Customers API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Images API V1");
             });
 
             app.UseMvc(routes =>

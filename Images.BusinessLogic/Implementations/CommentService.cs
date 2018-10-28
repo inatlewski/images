@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using AutoMapper;
 using Images.BusinessLogic.Interfaces;
 using Images.Common;
@@ -21,7 +22,7 @@ namespace Images.BusinessLogic.Implementations
             _logger = logger;
         }
 
-        public CommentOutDto GetComment(int commentId)
+        public OperationResult<CommentOutDto> GetComment(int commentId)
         {
             try
             {
@@ -29,73 +30,75 @@ namespace Images.BusinessLogic.Implementations
 
                 if (comment == null)
                 {
-                    return null;
+                    return new OperationResult<CommentOutDto>(HttpStatusCode.NotFound, ErrorMessage.CommentNotFound);
                 }
 
                 var commentDto = Mapper.Map<CommentOutDto>(comment);
 
-                return commentDto;
+                return new OperationResult<CommentOutDto>(commentDto, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.GetCommentExceptionMessage);
+                _logger.Error(e, ErrorMessage.GetCommentException);
 
-                return null;
+                return new OperationResult<CommentOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.GetCommentException);
             }
         }
 
-        public bool AddComment(CommentInDto commentDto)
+        public OperationResult<CommentOutDto> AddComment(int imageId, CommentInDto commentDto)
         {
             try
             {
                 if (commentDto == null)
                 {
-                    return false;
+                    return new OperationResult<CommentOutDto>(HttpStatusCode.BadRequest, ErrorMessage.CommentIsNull);
                 }
 
-                var comment = Mapper.Map<Comment>(commentDto);
-                _commentRepository.Add(comment);
+                var commentToAdd = Mapper.Map<Comment>(commentDto);
+                var addedComment = _commentRepository.Add(commentToAdd);
+                var commentOutDto = Mapper.Map<CommentOutDto>(addedComment);
 
-                return true;
+                return new OperationResult<CommentOutDto>(commentOutDto, HttpStatusCode.Created);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.AddCommentExceptionMessage);
+                _logger.Error(e, ErrorMessage.AddCommentException);
 
-                return false;
+                return new OperationResult<CommentOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.AddCommentException);
             }
         }
 
-        public bool UpdateComment(UpdateCommentInDto commentDto)
+        public OperationResult<CommentOutDto> UpdateComment(UpdateCommentInDto commentDto)
         {
             try
             {
                 if (commentDto == null)
                 {
-                    return false;
+                    return new OperationResult<CommentOutDto>(HttpStatusCode.BadRequest, ErrorMessage.CommentIsNull);
                 }
 
                 var comment = _commentRepository.FindByKey(commentDto.Id);
 
                 if (comment == null)
                 {
-                    return false;
+                    return new OperationResult<CommentOutDto>(HttpStatusCode.NotFound, ErrorMessage.CommentNotFound);
                 }
 
                 Mapper.Map(commentDto, comment);
-                _commentRepository.Update(comment);
+                var updatedComment = _commentRepository.Update(comment);
+                var commentOutDto = Mapper.Map<CommentOutDto>(updatedComment);
 
-                return true;
+                return new OperationResult<CommentOutDto>(commentOutDto, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.UpdateCommentExceptionMessage);
+                _logger.Error(e, ErrorMessage.UpdateCommentException);
 
-                return false;
+                return new OperationResult<CommentOutDto>(HttpStatusCode.InternalServerError, ErrorMessage.UpdateCommentException);
             }
         }
 
-        public bool DeleteComment(int commentId)
+        public OperationResult<bool> DeleteComment(int commentId)
         {
             try
             {
@@ -103,18 +106,18 @@ namespace Images.BusinessLogic.Implementations
 
                 if (comment == null)
                 {
-                    return false;
+                    return new OperationResult<bool>(HttpStatusCode.NotFound, ErrorMessage.CommentNotFound);
                 }
 
                 _commentRepository.Delete(comment);
 
-                return true;
+                return new OperationResult<bool>(true, HttpStatusCode.OK);
             }
             catch (Exception e)
             {
-                _logger.Error(e, ErrorMessages.DeleteCommentExceptionMessage);
+                _logger.Error(e, ErrorMessage.DeleteCommentException);
 
-                return false;
+                return new OperationResult<bool>(HttpStatusCode.InternalServerError, ErrorMessage.DeleteCommentException);
             }
         }
     }
